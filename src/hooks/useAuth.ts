@@ -10,8 +10,8 @@ export function useAuth() {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user as User | null);
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user as User | null);
       setLoading(false);
     });
 
