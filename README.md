@@ -17,6 +17,22 @@ Agenda personnel intelligent avec assistant IA conversationnel, compréhension d
 - **Streaming GPT-4o-mini** : Réponses en temps réel
 - **Compréhension NL** : Parsez vos commandes en langage naturel
 - **Actions contextuelles** : L'IA comprend vos intentions
+- **Actions externes** : Ouvrez N'IMPORTE QUEL site web depuis le chat
+
+### 🌐 Actions Externes Universelles
+- **30+ sites pré-configurés** : Facebook, Netflix, Amazon, Gmail, YouTube, etc.
+- **Génération automatique** : L'IA crée des liens pour TOUTE demande web
+- **Catégories supportées** :
+  - 📱 Réseaux sociaux (Facebook, Instagram, Twitter, LinkedIn, TikTok, Reddit)
+  - 📺 Streaming (Netflix, Disney+, Prime Video, YouTube, Twitch)
+  - 🛒 E-commerce (Amazon, eBay, AliExpress, Cdiscount, Fnac)
+  - 📧 Email (Gmail, Outlook, Yahoo)
+  - 📰 Actualités (Le Monde, Le Figaro, Libération, France Info)
+  - 📍 Maps & Navigation (Google Maps avec destinations)
+  - ✈️ Voyage (Google Flights, Hotels)
+  - 📚 Recherche (Google, Wikipédia)
+- **Liens cliquables** : Tous les URLs transformés en boutons
+- **Mobile-friendly** : Navigation native sans blocage popup
 
 ### 🎙️ Interaction Vocale
 - **Commande vocale** : Dictez vos événements (Speech-to-Text)
@@ -90,12 +106,57 @@ Marque "acheter du pain" comme terminé
 ```
 
 ### Via le Chat Assistant 💬
+
+**Gestion d'agenda :**
 ```
 Qu'ai-je aujourd'hui ?
 Montre-moi mes tâches en attente
 Crée une réunion d'équipe lundi prochain à 10h
 Quel est mon prochain événement ?
 Supprime le rdv de demain
+```
+
+**Ouverture de sites web (actions externes) :**
+```
+📱 Réseaux sociaux :
+"ouvre Facebook" → Bouton Facebook
+"va sur Instagram" → Bouton Instagram  
+"lance Twitter" → Bouton Twitter
+"ouvre LinkedIn" → Bouton LinkedIn
+
+📺 Streaming :
+"ouvre Netflix" → Bouton Netflix
+"va sur Disney+" → Bouton Disney+
+"lance Prime Video" → Bouton Prime Video
+
+🛒 Shopping :
+"ouvre Amazon" → Bouton Amazon
+"va sur eBay" → Bouton eBay
+"cherche sur Cdiscount" → Bouton Cdiscount
+
+📧 Email :
+"ouvre Gmail" → Bouton Gmail
+"va sur Outlook" → Bouton Outlook
+
+📍 Navigation :
+"ouvre Maps vers Paris" → Bouton Google Maps
+"itinéraire vers Lyon" → Bouton Google Maps
+
+🔍 Recherche :
+"cherche recette carbonara" → Bouton Google Search
+"recherche vidéo yoga" → Bouton YouTube
+"c'est quoi Einstein" → Bouton Wikipédia
+
+✈️ Voyage :
+"recherche vol Paris-Tokyo" → Bouton Google Flights
+"trouve hôtel à Rome" → Bouton Google Hotels
+
+🎵 Musique :
+"mets de la musique" → Bouton Amazon Music
+"ouvre Spotify" → Bouton Spotify
+
+✨ Et N'IMPORTE QUEL autre site !
+"ouvre [nom du site]" → L'IA génère le lien automatiquement
 ```
 
 ### Commandes vocales 🎙️
@@ -130,11 +191,15 @@ src/
 ├── lib/                   # Logique métier
 │   ├── openai/           # Client & Parser OpenAI
 │   ├── supabase/         # Client & Queries Supabase
+│   ├── actionHandler.ts  # Générateurs d'URLs externes
+│   ├── externalActions.ts # Parser d'actions externes
+│   ├── linkify.ts        # Transformation URLs en liens
 │   └── utils.ts
 ├── hooks/                # Custom hooks
 │   └── useAuth.ts
 └── types/                # Types TypeScript
-    └── index.ts
+    ├── index.ts
+    └── actions.ts        # Types pour actions externes
 ```
 
 ## 🚀 Déploiement
@@ -179,6 +244,42 @@ Les contributions sont les bienvenues !
 
 MIT License - voir le fichier LICENSE
 
+## 🎯 Fonctionnalités Uniques
+
+### 🌐 Système d'Actions Externes Universel
+
+L'assistant peut **ouvrir N'IMPORTE QUEL site web** depuis le chat :
+
+1. **Détection intelligente** : L'IA comprend "ouvre [site]" automatiquement
+2. **Génération de lien** : Crée l'URL appropriée
+3. **Bouton cliquable** : Affiche un bouton sous le message
+4. **Navigation native** : Utilise `<a href>` pour éviter les blocages mobile
+
+**Architecture :**
+```
+User: "ouvre Facebook"
+  ↓
+GPT: Génère {"action":"open_link","url":"https://facebook.com"}
+  ↓
+externalActions.ts: Parse le JSON
+  ↓
+actionHandler.ts: Valide et génère l'URL
+  ↓
+ActionButton.tsx: Affiche le bouton cliquable
+  ↓
+Navigateur: Ouvre le site dans nouvel onglet
+```
+
+**Sites supportés nativement :**
+- 📱 **30+ réseaux sociaux** (Facebook, Instagram, Twitter, LinkedIn, TikTok...)
+- 📺 **Services streaming** (Netflix, Disney+, YouTube, Twitch...)
+- 🛒 **E-commerce** (Amazon, eBay, Cdiscount, Fnac...)
+- 📧 **Webmail** (Gmail, Outlook, Yahoo...)
+- 📰 **Médias** (Le Monde, Le Figaro, Libération...)
+- ✨ **+ toute URL personnalisée !**
+
+Voir [ACTIONS_EXTERNES.md](./ACTIONS_EXTERNES.md) pour la doc complète.
+
 ## 🐛 Problèmes connus
 
 - La reconnaissance vocale nécessite HTTPS (fonctionne en local et sur Vercel)
@@ -187,12 +288,18 @@ MIT License - voir le fichier LICENSE
 
 ## 🎯 Roadmap
 
+- [x] ✅ Actions externes universelles (FAIT !)
+- [x] ✅ Auto-linkify des URLs (FAIT !)
+- [x] ✅ Support mobile sans blocage popup (FAIT !)
 - [ ] Récurrence d'événements
 - [ ] Partage d'agenda
 - [ ] Export iCal/Google Calendar
 - [ ] Application mobile (React Native)
 - [ ] Intégration calendriers externes
 - [ ] Support multi-langues
+- [ ] Deeplinks vers apps natives mobile
+- [ ] Historique des actions externes
+- [ ] Favoris de liens rapides
 
 ---
 
