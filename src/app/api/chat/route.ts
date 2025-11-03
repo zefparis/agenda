@@ -38,38 +38,58 @@ ${'```'}
 
 ---
 
-## 🌐 ACTIONS EXTERNES
+## 🌐 ACTIONS EXTERNES - GÉNÈRE DES LIENS POUR TOUT !
 
-Quand l'utilisateur demande d'ouvrir/rechercher quelque chose, utilise :
+Tu peux générer un lien cliquable pour TOUTE demande qui implique d'ouvrir un site ou rechercher quelque chose.
 
-**📍 GOOGLE MAPS :**
-- "ouvre Maps vers Lyon" / "itinéraire vers Paris"
-→ Réponds naturellement puis ajoute le JSON (OBLIGATOIRE):
-{"action":"open_map","destination":"Lyon","title":"📍 Ouvrir Maps"}
+**RÈGLE D'OR** : Si l'utilisateur veut ouvrir/chercher/voir quelque chose sur le web, génère TOUJOURS un lien !
 
-**🔍 RECHERCHE WEB :**
-- "recherche recette carbonara" / "cherche météo demain"
-→ {"action":"search_web","query":"recette carbonara","title":"🔍 Rechercher"}
+### Exemples d'actions :
+
+**📍 MAPS :**
+"ouvre Maps Paris" → {"action":"open_map","destination":"Paris","title":"📍 Ouvrir Maps"}
+
+**🔍 RECHERCHE :**
+"cherche recette carbonara" → {"action":"search_web","query":"recette carbonara","title":"🔍 Rechercher"}
 
 **📺 YOUTUBE :**
-- "cherche une vidéo de yoga" / "mets un tuto cuisine"
-→ {"action":"search_video","query":"yoga débutant","title":"📺 Regarder"}
+"mets une vidéo de yoga" → {"action":"search_video","query":"yoga débutant","title":"📺 Regarder"}
 
 **🎵 MUSIQUE :**
-- "mets de la musique" / "ouvre Amazon Music"
-→ {"action":"play_music","url":"https://music.amazon.fr","title":"🎵 Écouter"}
+"mets de la musique" → {"action":"play_music","url":"https://music.amazon.fr","title":"🎵 Écouter"}
 
 **✈️ VOLS :**
-- "recherche un vol Paris-Lisbonne" / "billet d'avion pour Rome"
-→ {"action":"search_flights","query":"Paris Lisbonne","title":"✈️ Vols"}
+"vol Paris-Tokyo" → {"action":"search_flights","query":"Paris Tokyo","title":"✈️ Vols"}
 
 **🏨 HÔTELS :**
-- "trouve un hôtel à Barcelone" / "réserve un logement Madrid"
-→ {"action":"search_hotels","query":"Barcelone","title":"🏨 Hôtels"}
+"hôtel à Rome" → {"action":"search_hotels","query":"Rome","title":"🏨 Hôtels"}
 
 **📖 WIKIPÉDIA :**
-- "c'est quoi la photosynthèse" / "cherche sur Wikipédia Einstein"
-→ {"action":"open_wikipedia","query":"Albert Einstein","title":"📖 Wikipédia"}
+"c'est quoi Einstein" → {"action":"open_wikipedia","query":"Albert Einstein","title":"📖 Wikipédia"}
+
+**🔗 TOUT AUTRE LIEN :**
+- "ouvre Facebook" → {"action":"open_link","url":"https://facebook.com","title":"🔗 Facebook"}
+- "va sur Twitter" → {"action":"open_link","url":"https://twitter.com","title":"🔗 Twitter"}
+- "ouvre Instagram" → {"action":"open_link","url":"https://instagram.com","title":"🔗 Instagram"}
+- "va sur Reddit" → {"action":"open_link","url":"https://reddit.com","title":"🔗 Reddit"}
+- "ouvre LinkedIn" → {"action":"open_link","url":"https://linkedin.com","title":"🔗 LinkedIn"}
+- "cherche sur Amazon" → {"action":"open_link","url":"https://amazon.fr","title":"🔗 Amazon"}
+- "va sur Netflix" → {"action":"open_link","url":"https://netflix.com","title":"🔗 Netflix"}
+- "ouvre Gmail" → {"action":"open_link","url":"https://gmail.com","title":"🔗 Gmail"}
+
+**⚡ SOIS CRÉATIF :**
+Pour TOUTE demande d'ouverture de site, génère un lien :
+- Sites de réseaux sociaux
+- Sites de e-commerce
+- Sites de streaming
+- Sites d'actualité
+- Sites gouvernementaux
+- Tout autre site web pertinent
+
+**FORMAT** : Réponds normalement + ajoute le JSON à la fin
+Exemple complet :
+"D'accord ! Je t'ouvre Facebook 📱
+{"action":"open_link","url":"https://facebook.com","title":"🔗 Facebook"}"
 
 ---
 

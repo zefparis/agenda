@@ -59,6 +59,61 @@ export const MUSIC_SERVICES = {
 };
 
 /**
+ * URLs des sites populaires pour génération automatique
+ */
+export const POPULAR_SITES: Record<string, string> = {
+  // Réseaux sociaux
+  facebook: 'https://facebook.com',
+  twitter: 'https://twitter.com',
+  instagram: 'https://instagram.com',
+  linkedin: 'https://linkedin.com',
+  tiktok: 'https://tiktok.com',
+  snapchat: 'https://snapchat.com',
+  reddit: 'https://reddit.com',
+  pinterest: 'https://pinterest.com',
+  
+  // E-commerce
+  amazon: 'https://amazon.fr',
+  ebay: 'https://ebay.fr',
+  aliexpress: 'https://aliexpress.com',
+  cdiscount: 'https://cdiscount.com',
+  fnac: 'https://fnac.com',
+  
+  // Streaming
+  netflix: 'https://netflix.com',
+  disney: 'https://disneyplus.com',
+  primevideo: 'https://primevideo.com',
+  youtube: 'https://youtube.com',
+  twitch: 'https://twitch.tv',
+  
+  // Email & Productivité
+  gmail: 'https://gmail.com',
+  outlook: 'https://outlook.com',
+  yahoo: 'https://yahoo.com',
+  
+  // Actualités
+  lemonde: 'https://lemonde.fr',
+  lefigaro: 'https://lefigaro.fr',
+  liberation: 'https://liberation.fr',
+  franceinfo: 'https://francetvinfo.fr',
+  
+  // Utilitaires
+  google: 'https://google.com',
+  drive: 'https://drive.google.com',
+  dropbox: 'https://dropbox.com',
+  github: 'https://github.com',
+  stackoverflow: 'https://stackoverflow.com',
+};
+
+/**
+ * Détecte et retourne l'URL d'un site populaire
+ */
+export function getPopularSiteUrl(siteName: string): string | null {
+  const normalized = siteName.toLowerCase().replace(/\s+/g, '');
+  return POPULAR_SITES[normalized] || null;
+}
+
+/**
  * Exécute une action externe (ouvre un lien dans un nouvel onglet)
  */
 export function executeAction(action: ExternalAction): void {
