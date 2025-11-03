@@ -309,29 +309,29 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
 
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 sm:gap-2">
           <input
             value={input}
             onChange={handleInputChange}
-            placeholder="Posez votre question ou parlez..."
+            placeholder="Posez votre question..."
             disabled={isLoading}
-            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors"
+            className="flex-1 min-w-0 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors"
           />
           
           {/* Voice Button */}
           <button
             type="button"
             onClick={() => setShowVoice(!showVoice)}
-            className="px-3 sm:px-4 py-2 sm:py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
+            className="flex-shrink-0 p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
             title="Commande vocale"
           >
-            <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Mic className="w-5 h-5" />
           </button>
 
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white font-semibold hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-600 transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+            className="flex-shrink-0 p-2.5 sm:px-5 sm:py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white font-semibold hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
