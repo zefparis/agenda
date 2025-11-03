@@ -7,6 +7,7 @@ import { VoiceInput } from './VoiceInput';
 import { ActionButton } from './ActionButton';
 import { parseAction, cleanMessage } from '@/lib/chatActions';
 import { parseExternalActions, cleanExternalActionFromMessage, hasExternalAction } from '@/lib/externalActions';
+import { formatMessageWithLinks } from '@/lib/linkify';
 import { ExternalAction } from '@/types/actions';
 
 interface Message {
@@ -263,7 +264,10 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <div 
+                    className="text-sm whitespace-pre-wrap"
+                    dangerouslySetInnerHTML={{ __html: formatMessageWithLinks(message.content) }}
+                  />
                 </div>
                 
                 {message.role === 'assistant' && message.content && (

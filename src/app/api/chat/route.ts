@@ -44,52 +44,32 @@ Quand l'utilisateur demande d'ouvrir/rechercher quelque chose, utilise :
 
 **📍 GOOGLE MAPS :**
 - "ouvre Maps vers Lyon" / "itinéraire vers Paris"
-→ 🔗 **ACTION: EXTERNAL**
-${'```'}json
-{"action":"open_map","destination":"Lyon","title":"Ouvrir Maps vers Lyon"}
-${'```'}
+→ Réponds naturellement puis ajoute le JSON (OBLIGATOIRE):
+{"action":"open_map","destination":"Lyon","title":"📍 Ouvrir Maps"}
 
 **🔍 RECHERCHE WEB :**
 - "recherche recette carbonara" / "cherche météo demain"
-→ 🔗 **ACTION: EXTERNAL**
-${'```'}json
-{"action":"search_web","query":"recette carbonara","title":"Rechercher sur Google"}
-${'```'}
+→ {"action":"search_web","query":"recette carbonara","title":"🔍 Rechercher"}
 
 **📺 YOUTUBE :**
 - "cherche une vidéo de yoga" / "mets un tuto cuisine"
-→ 🔗 **ACTION: EXTERNAL**
-${'```'}json
-{"action":"search_video","query":"yoga débutant","title":"Regarder sur YouTube"}
-${'```'}
+→ {"action":"search_video","query":"yoga débutant","title":"📺 Regarder"}
 
 **🎵 MUSIQUE :**
-- "mets de la musique" / "ouvre Amazon Music" / "lance Spotify"
-→ 🔗 **ACTION: EXTERNAL**
-${'```'}json
-{"action":"play_music","url":"https://music.amazon.fr","title":"Ouvrir Amazon Music"}
-${'```'}
+- "mets de la musique" / "ouvre Amazon Music"
+→ {"action":"play_music","url":"https://music.amazon.fr","title":"🎵 Écouter"}
 
 **✈️ VOLS :**
 - "recherche un vol Paris-Lisbonne" / "billet d'avion pour Rome"
-→ 🔗 **ACTION: EXTERNAL**
-${'```'}json
-{"action":"search_flights","query":"Paris Lisbonne","title":"Rechercher des vols"}
-${'```'}
+→ {"action":"search_flights","query":"Paris Lisbonne","title":"✈️ Vols"}
 
 **🏨 HÔTELS :**
 - "trouve un hôtel à Barcelone" / "réserve un logement Madrid"
-→ 🔗 **ACTION: EXTERNAL**
-${'```'}json
-{"action":"search_hotels","query":"Barcelone","title":"Rechercher des hôtels"}
-${'```'}
+→ {"action":"search_hotels","query":"Barcelone","title":"🏨 Hôtels"}
 
 **📖 WIKIPÉDIA :**
 - "c'est quoi la photosynthèse" / "cherche sur Wikipédia Einstein"
-→ 🔗 **ACTION: EXTERNAL**
-${'```'}json
-{"action":"open_wikipedia","query":"Albert Einstein","title":"Consulter Wikipédia"}
-${'```'}
+→ {"action":"open_wikipedia","query":"Albert Einstein","title":"📖 Wikipédia"}
 
 ---
 

@@ -3,27 +3,32 @@ import { parseActionFromGPT } from './actionHandler';
 
 /**
  * Parse les actions externes depuis un message GPT
- * Recherche le pattern: 🔗 **ACTION: EXTERNAL** suivi d'un bloc JSON
+ * Recherche plusieurs patterns possibles pour plus de robustesse
  */
 export function parseExternalActions(message: string): ExternalAction | null {
   try {
-    // Rechercher le marker d'action externe
-    const externalMarker = /🔗\s*\*\*ACTION:\s*EXTERNAL\*\*/i;
+    // Pattern 1: Avec marker 🔗 **ACTION: EXTERNAL**
+    const jsonMatch1 = message.match(/🔗\s*\*\*ACTION:\s*EXTERNAL\*\*\s*```json\s*\n?\s*(\{[^`]+\})\s*\n?```/i);
     
-    if (!externalMarker.test(message)) {
-      return null;
-    }
+    // Pattern 2: Juste un bloc ```json avec "action"
+    const jsonMatch2 = message.match(/```json\s*\n?\s*(\{[^`]+?"action"\s*:\s*"[^"]+[^`]+\})\s*\n?```/);
+    
+    // Pattern 3: JSON inline sans backticks mais avec "action":
+    const jsonMatch3 = message.match(/\{[^}]*"action"\s*:\s*"(open_map|search_web|search_video|play_music|search_flights|search_hotels|open_wikipedia|open_link)"[^}]*\}/);
 
-    // Extraire le bloc JSON après le marker
-    const jsonMatch = message.match(/```json\s*\n?\s*(\{[^`]+\})\s*\n?```/);
+    const jsonText = jsonMatch1?.[1] || jsonMatch2?.[1] || jsonMatch3?.[0];
     
-    if (!jsonMatch || !jsonMatch[1]) {
-      console.warn('External action marker found but no valid JSON block');
+    if (!jsonText) {
       return null;
     }
 
     // Parser le JSON
-    const actionData = JSON.parse(jsonMatch[1]);
+    const actionData = JSON.parse(jsonText);
+    
+    // Vérifier que c'est bien une action externe (pas une action d'événement)
+    if (actionData.action === 'create' || actionData.action === 'update' || actionData.action === 'delete') {
+      return null; // C'est une action d'événement, pas externe
+    }
     
     // Valider et transformer en ExternalAction
     const parsedAction = parseActionFromGPT(actionData);
@@ -43,19 +48,26 @@ export function parseExternalActions(message: string): ExternalAction | null {
 }
 
 /**
- * Nettoie le message en retirant le bloc d'action pour l'affichage
+ * Nettoie le message en retirant tous les blocs d'action pour l'affichage
  */
 export function cleanExternalActionFromMessage(message: string): string {
-  // Retirer le marker et le bloc JSON
   return message
-    .replace(/🔗\s*\*\*ACTION:\s*EXTERNAL\*\*\s*/gi, '')
-    .replace(/```json\s*\n?\s*\{[^`]+\}\s*\n?```/g, '')
+    // Retirer le marker avec bloc JSON
+    .replace(/🔗\s*\*\*ACTION:\s*EXTERNAL\*\*\s*```json\s*\n?\s*\{[^`]+\}\s*\n?```/gi, '')
+    // Retirer les blocs JSON génériques avec "action"
+    .replace(/```json\s*\n?\s*\{[^`]*"action"\s*:\s*"[^"]+[^`]*\}\s*\n?```/g, '')
+    // Retirer JSON inline avec action externe
+    .replace(/\{[^}]*"action"\s*:\s*"(open_map|search_web|search_video|play_music|search_flights|search_hotels|open_wikipedia|open_link)"[^}]*\}/g, '')
     .trim();
 }
 
 /**
- * Vérifie si un message contient une action externe
+ * Vérifie si un message contient une action externe (plus permissif)
  */
 export function hasExternalAction(message: string): boolean {
-  return /🔗\s*\*\*ACTION:\s*EXTERNAL\*\*/i.test(message);
+  // Vérifier plusieurs patterns
+  const hasMarker = /🔗\s*\*\*ACTION:\s*EXTERNAL\*\*/i.test(message);
+  const hasActionJson = /"action"\s*:\s*"(open_map|search_web|search_video|play_music|search_flights|search_hotels|open_wikipedia|open_link)"/i.test(message);
+  
+  return hasMarker || hasActionJson;
 }
