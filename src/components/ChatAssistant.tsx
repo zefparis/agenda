@@ -5,6 +5,7 @@ import { Send, Loader2, Trash2, Bot, User, Mic, Calendar, Volume2, VolumeX } fro
 import { motion, AnimatePresence } from 'framer-motion';
 import { VoiceInput } from './VoiceInput';
 import { ActionButton } from './ActionButton';
+import { FavoriteLinks } from './FavoriteLinks';
 import { parseAction, cleanMessage } from '@/lib/chatActions';
 import { parseExternalActions, cleanExternalActionFromMessage, hasExternalAction } from '@/lib/externalActions';
 import { formatMessageWithLinks } from '@/lib/linkify';
@@ -237,6 +238,11 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
                   {suggestion}
                 </button>
               ))}
+            </div>
+
+            {/* Favoris et historique des liens */}
+            <div className="mt-8 max-w-2xl mx-auto">
+              <FavoriteLinks />
             </div>
           </motion.div>
         )}

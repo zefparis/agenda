@@ -23,3 +23,17 @@ export interface ActionResponse {
   message: string;
   action?: ExternalAction;
 }
+
+/**
+ * Mémoire des actions externes ouvertes
+ * Stockage : Supabase (table external_action_memory) + fallback localStorage
+ */
+export interface ExternalActionMemory {
+  id: string;
+  url: string;
+  label: string;
+  action_type?: ActionType;
+  is_favorite: boolean;
+  created_at: string;
+  used_count?: number;
+}
