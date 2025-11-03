@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Linkify</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .message {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test des liens cliquables</h1>
+    
+    <div class="message">
+        <p>Message avec lien :</p>
+        <div id="test1"></div>
+    </div>
+
+    <div class="message">
+        <p>Message avec plusieurs liens :</p>
+        <div id="test2"></div>
+    </div>
+
+    <script>
+        function linkifyText(text) {
+            const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/g;
+            return text.replace(urlRegex, (url) => {
+                const cleanUrl = url.replace(/[.,;:!?)\]]+$/, '');
+                const punctuation = url.slice(cleanUrl.length);
+                return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline; font-weight: 500; cursor: pointer;">${cleanUrl}</a>${punctuation}`;
+            });
+        }
+
+        // Test 1
+        const text1 = "Voici un lien https://www.google.com/maps pour tester";
+        document.getElementById('test1').innerHTML = linkifyText(text1);
+
+        // Test 2
+        const text2 = "Visite https://youtube.com et https://wikipedia.org pour plus d'infos.";
+        document.getElementById('test2').innerHTML = linkifyText(text2);
+
+        console.log('✅ Links generated:', {
+            test1: linkifyText(text1),
+            test2: linkifyText(text2)
+        });
+    </script>
+</body>
+</html>

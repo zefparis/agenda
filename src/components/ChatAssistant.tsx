@@ -265,7 +265,7 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
                   }`}
                 >
                   <div 
-                    className="text-sm whitespace-pre-wrap"
+                    className="message-content text-sm whitespace-pre-wrap [&_a]:pointer-events-auto [&_a]:relative [&_a]:z-10"
                     dangerouslySetInnerHTML={{ __html: formatMessageWithLinks(message.content) }}
                   />
                 </div>

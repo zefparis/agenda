@@ -10,7 +10,7 @@ export function linkifyText(text: string): string {
     const cleanUrl = url.replace(/[.,;:!?)\]]+$/, '');
     const punctuation = url.slice(cleanUrl.length);
     
-    return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">${cleanUrl}</a>${punctuation}`;
+    return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: underline; font-weight: 500; cursor: pointer;">${cleanUrl}</a>${punctuation}`;
   });
 }
 
