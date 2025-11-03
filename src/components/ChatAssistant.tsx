@@ -4,12 +4,16 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, Trash2, Bot, User, Mic, Calendar, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VoiceInput } from './VoiceInput';
+import { ActionButton } from './ActionButton';
 import { parseAction, cleanMessage } from '@/lib/chatActions';
+import { parseExternalActions, cleanExternalActionFromMessage, hasExternalAction } from '@/lib/externalActions';
+import { ExternalAction } from '@/types/actions';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  externalAction?: ExternalAction;
 }
 
 interface ChatAssistantProps {
@@ -108,7 +112,7 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
         ));
       }
 
-      // Vérifier si le message contient une action
+      // Vérifier si le message contient une action d'événement
       const action = parseAction(assistantMessage);
       if (action && onEventAction) {
         console.log('🗓️ Action détectée:', action);
@@ -119,6 +123,20 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
         setMessages(prev => prev.map(m =>
           m.id === assistantId ? { ...m, content: cleanedMessage } : m
         ));
+      }
+
+      // Vérifier si le message contient une action externe
+      if (hasExternalAction(assistantMessage)) {
+        const externalAction = parseExternalActions(assistantMessage);
+        if (externalAction) {
+          console.log('🔗 Action externe détectée:', externalAction);
+          
+          // Nettoyer le message et ajouter l'action
+          const cleanedContent = cleanExternalActionFromMessage(assistantMessage);
+          setMessages(prev => prev.map(m =>
+            m.id === assistantId ? { ...m, content: cleanedContent, externalAction } : m
+          ));
+        }
       }
 
     } catch (err) {
@@ -266,6 +284,11 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
                       </>
                     )}
                   </button>
+                )}
+                
+                {/* Action externe button */}
+                {message.role === 'assistant' && message.externalAction && (
+                  <ActionButton action={message.externalAction} />
                 )}
               </div>
 
