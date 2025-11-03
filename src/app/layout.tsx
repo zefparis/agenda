@@ -15,6 +15,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Mon Agenda Intelligent",
   description: "Agenda personnel intelligent avec parsing en langage naturel",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({
@@ -29,7 +35,8 @@ export default function RootLayout({
           __html: `
             (function() {
               const stored = localStorage.getItem('darkMode');
-              const isDark = stored !== null ? stored === 'true' : true;
+              const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+              const isDark = stored !== null ? stored === 'true' : prefersDark;
               if (isDark) {
                 document.documentElement.classList.add('dark');
               }

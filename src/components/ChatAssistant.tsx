@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Trash2, Bot, User, Mic, Calendar } from 'lucide-react';
+import { Send, Loader2, Trash2, Bot, User, Mic, Calendar, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VoiceInput } from './VoiceInput';
 import { parseAction, cleanMessage } from '@/lib/chatActions';
@@ -23,6 +23,7 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showVoice, setShowVoice] = useState(false);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -33,6 +34,15 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Cleanup : arrêter la lecture au démontage du composant
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent | any, options?: { data?: string }) => {
     if (e) e.preventDefault();
@@ -132,6 +142,29 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     }, 100);
   };
 
+  const speak = (text: string, messageId: string) => {
+    // Arrêter toute lecture en cours
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      if (speakingId === messageId) {
+        setSpeakingId(null);
+        return;
+      }
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'fr-FR';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onstart = () => setSpeakingId(messageId);
+    utterance.onend = () => setSpeakingId(null);
+    utterance.onerror = () => setSpeakingId(null);
+
+    window.speechSynthesis.speak(utterance);
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-200px)] md:h-[calc(100vh-200px)] sm:h-[calc(100vh-150px)] bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-gray-200 dark:border-gray-700">
       {/* Header */}
@@ -204,14 +237,36 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
                 </div>
               )}
               
-              <div
-                className={`max-w-[80%] px-4 py-3 rounded-2xl ${
-                  message.role === 'user'
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                }`}
-              >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              <div className="flex flex-col gap-2 max-w-[80%]">
+                <div
+                  className={`px-4 py-3 rounded-2xl ${
+                    message.role === 'user'
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                  }`}
+                >
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                </div>
+                
+                {message.role === 'assistant' && message.content && (
+                  <button
+                    onClick={() => speak(message.content, message.id)}
+                    className="self-start px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300"
+                    title={speakingId === message.id ? 'Arrêter la lecture' : 'Lire à voix haute'}
+                  >
+                    {speakingId === message.id ? (
+                      <>
+                        <VolumeX className="w-3.5 h-3.5" />
+                        <span>Arrêter</span>
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 className="w-3.5 h-3.5" />
+                        <span>Écouter</span>
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
 
               {message.role === 'user' && (

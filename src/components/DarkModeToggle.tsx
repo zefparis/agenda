@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
 export function DarkModeToggle() {
-  const [isDark, setIsDark] = useState(true); // Dark mode par défaut
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    // Dark mode activé par défaut
+    // Détecter les préférences système
     const stored = localStorage.getItem('darkMode');
-    const initialDark = stored !== null ? stored === 'true' : true;
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialDark = stored !== null ? stored === 'true' : prefersDark;
     
     setIsDark(initialDark);
     if (initialDark) {
