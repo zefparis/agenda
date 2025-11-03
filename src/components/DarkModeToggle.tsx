@@ -1,16 +1,46 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useTheme } from './ThemeProvider';
 
 export function DarkModeToggle() {
-  const { theme, toggleTheme } = useTheme();
-  const isDark = theme === 'dark';
+  const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const stored = localStorage.getItem('darkMode');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialDark = stored !== null ? stored === 'true' : prefersDark;
+    setIsDark(initialDark);
+    applyTheme(initialDark);
+  }, []);
+
+  const applyTheme = (dark: boolean) => {
+    if (dark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  const toggleDarkMode = () => {
+    const newDark = !isDark;
+    setIsDark(newDark);
+    localStorage.setItem('darkMode', String(newDark));
+    applyTheme(newDark);
+  };
+
+  if (!mounted) {
+    return (
+      <div className="p-3 rounded-xl bg-gray-200 dark:bg-gray-700 shadow-lg border-2 border-gray-300 dark:border-gray-600 w-[52px] h-[52px]" />
+    );
+  }
 
   return (
     <motion.button
-      onClick={toggleTheme}
+      onClick={toggleDarkMode}
       whileTap={{ scale: 0.95 }}
       className="p-3 rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all border-2 border-gray-200 dark:border-gray-700"
       aria-label="Toggle dark mode"
