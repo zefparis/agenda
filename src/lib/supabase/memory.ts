@@ -171,6 +171,7 @@ export async function getActionHistory(limit: number = 50): Promise<ExternalActi
 
     return (data as ExternalActionMemory[]) || [];
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching history:', error);
     return getFromLocalStorage(limit);
   }
