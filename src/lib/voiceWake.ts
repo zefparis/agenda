@@ -29,14 +29,31 @@ export async function initWakeWord(
     }
 
     console.log('🎙️ Initialisation de Porcupine...');
+    console.log('🔧 Chargement du modèle depuis:', config.modelPath);
 
-    // Créer une instance Porcupine
+    // Charger le modèle en base64 (plus fiable que publicPath)
+    const modelResponse = await fetch(config.modelPath);
+    if (!modelResponse.ok) {
+      throw new Error(`Impossible de charger le modèle: ${config.modelPath}`);
+    }
+    
+    const modelArrayBuffer = await modelResponse.arrayBuffer();
+    const modelBase64 = btoa(
+      new Uint8Array(modelArrayBuffer).reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        ""
+      )
+    );
+    
+    console.log('✅ Modèle chargé et converti en base64');
+
+    // Créer une instance Porcupine avec le modèle en base64
     porcupineInstance = await PorcupineWorker.create(
       config.accessKey,
       [
         {
           label: 'hello-benji',
-          publicPath: config.modelPath,
+          base64: modelBase64,  // Utilisation de base64 au lieu de publicPath
           sensitivity: config.sensitivity || 0.5
         }
       ],
