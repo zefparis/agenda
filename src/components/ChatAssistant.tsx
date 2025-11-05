@@ -483,6 +483,34 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
 
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700">
+        {/* Boutons vocaux en haut sur 2 colonnes */}
+        <div className="flex gap-2 mb-3">
+          {/* Voice Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setShowVoice(!showVoice);
+              setAutoStartVoice(false);
+            }}
+            className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+            title="Commande vocale ponctuelle"
+          >
+            <Mic className="w-5 h-5" />
+            <span className="text-sm">Vocal</span>
+          </button>
+
+          {/* Continuous Mode Button */}
+          <div className="flex-1">
+            <ContinuousVoiceInput
+              onTranscript={handleVoiceTranscript}
+              isAssistantSpeaking={isLoading}
+              enabled={continuousMode}
+              onToggle={() => setContinuousMode(!continuousMode)}
+            />
+          </div>
+        </div>
+
+        {/* Input et bouton d'envoi */}
         <div className="flex gap-1.5 sm:gap-2">
           <input
             value={input}
@@ -491,39 +519,19 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
             disabled={isLoading}
             className="flex-1 min-w-0 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors"
           />
-          
-          {/* Voice Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setShowVoice(!showVoice);
-              setAutoStartVoice(false); // Ne pas auto-démarrer sur clic manuel
-            }}
-            className="flex-shrink-0 p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
-            title="Commande vocale"
-          >
-            <Mic className="w-5 h-5" />
-          </button>
-
-          {/* Continuous Mode Button */}
-          <div className="flex-shrink-0">
-            <ContinuousVoiceInput
-              onTranscript={handleVoiceTranscript}
-              isAssistantSpeaking={isLoading}
-              enabled={continuousMode}
-              onToggle={() => setContinuousMode(!continuousMode)}
-            />
-          </div>
 
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="flex-shrink-0 p-2.5 sm:px-5 sm:py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white font-semibold hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center"
+            className="flex-shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white font-semibold hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-600 transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Send className="w-5 h-5" />
+              <>
+                <Send className="w-5 h-5" />
+                <span className="hidden sm:inline text-sm">Envoyer</span>
+              </>
             )}
           </button>
         </div>

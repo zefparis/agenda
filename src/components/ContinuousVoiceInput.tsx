@@ -161,12 +161,12 @@ export function ContinuousVoiceInput({
   }
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <motion.button
         type="button"
         onClick={onToggle}
         whileTap={{ scale: 0.95 }}
-        className={`px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl flex items-center gap-2 text-sm ${
+        className={`w-full px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm ${
           enabled
             ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white animate-pulse'
             : 'bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white'
@@ -176,12 +176,12 @@ export function ContinuousVoiceInput({
         {enabled ? (
           <>
             <Volume2 className="w-5 h-5" />
-            <span className="hidden sm:inline">Écoute Active</span>
+            <span className="text-sm">Écoute Active</span>
           </>
         ) : (
           <>
             <Mic className="w-5 h-5" />
-            <span className="hidden sm:inline">Mode Continu</span>
+            <span className="text-sm">Mode Continu</span>
           </>
         )}
       </motion.button>
