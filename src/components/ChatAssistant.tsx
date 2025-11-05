@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Loader2, Trash2, Bot, User, Mic, Calendar, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VoiceInput } from './VoiceInput';
 import { ActionButton } from './ActionButton';
 import { FavoriteLinks } from './FavoriteLinks';
+import { WakeIndicator } from './WakeIndicator';
+import { useWakeWord } from '@/hooks/useWakeWord';
 import { parseAction, cleanMessage } from '@/lib/chatActions';
 import { parseExternalActions, cleanExternalActionFromMessage, hasExternalAction } from '@/lib/externalActions';
 import { formatMessageWithLinks } from '@/lib/linkify';
@@ -30,8 +32,10 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   const [error, setError] = useState<string | null>(null);
   const [showVoice, setShowVoice] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [wakeWordEnabled, setWakeWordEnabled] = useState(true);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const voiceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -46,6 +50,9 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     return () => {
       if (window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
+      }
+      if (voiceTimeoutRef.current) {
+        clearTimeout(voiceTimeoutRef.current);
       }
     };
   }, []);
@@ -154,8 +161,15 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   };
 
   const handleVoiceTranscript = (transcript: string) => {
+    // Nettoyer le timeout
+    if (voiceTimeoutRef.current) {
+      clearTimeout(voiceTimeoutRef.current);
+      voiceTimeoutRef.current = null;
+    }
+    
     setInput(transcript);
     setShowVoice(false);
+    
     // Auto-submit après transcription
     setTimeout(() => {
       handleSubmit(null as any, { data: transcript });
@@ -184,6 +198,49 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
 
     window.speechSynthesis.speak(utterance);
   };
+
+  // Fonction TTS pour confirmer l'activation
+  const speakConfirmation = useCallback((text: string) => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'fr-FR';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+  }, []);
+
+  // Activer automatiquement la commande vocale après détection du wake word
+  const handleWakeDetection = useCallback(() => {
+    console.log('🔥 Wake word détecté dans ChatAssistant');
+    
+    // TTS: Confirmation vocale
+    speakConfirmation('Oui Benji, je t\'écoute !');
+    
+    // Activer la saisie vocale
+    setShowVoice(true);
+    
+    // Timeout automatique après 10 secondes de silence
+    if (voiceTimeoutRef.current) {
+      clearTimeout(voiceTimeoutRef.current);
+    }
+    
+    voiceTimeoutRef.current = setTimeout(() => {
+      console.log('⏱️ Timeout: fermeture automatique de la commande vocale');
+      setShowVoice(false);
+    }, 10000);
+  }, [speakConfirmation]);
+
+  // Hook pour le wake word "Hello Benji"
+  const wakeWord = useWakeWord({
+    accessKey: process.env.NEXT_PUBLIC_PICOVOICE_ACCESS_KEY || '',
+    modelPath: '/models/hello_benji.ppn',
+    sensitivity: 0.5,
+    enabled: wakeWordEnabled,
+    onWake: handleWakeDetection,
+    autoStart: true
+  });
 
   return (
     <div className="flex flex-col h-[calc(100vh-200px)] md:h-[calc(100vh-200px)] sm:h-[calc(100vh-150px)] bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-gray-200 dark:border-gray-700">
@@ -339,6 +396,12 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
 
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Wake Word Indicator */}
+      <WakeIndicator 
+        isListening={wakeWord.isListening} 
+        isWakeDetected={wakeWord.isWakeDetected}
+      />
 
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700">

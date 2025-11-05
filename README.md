@@ -35,9 +35,12 @@ Agenda personnel intelligent avec assistant IA conversationnel, compréhension d
 - **Mobile-friendly** : Navigation native sans blocage popup
 
 ### 🎙️ Interaction Vocale
+- **Wake Word "Hello Benji"** : Activation vocale mains-libres (Porcupine)
+- **Détection locale** : 100% offline, aucune donnée envoyée au cloud
 - **Commande vocale** : Dictez vos événements (Speech-to-Text)
 - **Lecture audio** : Écoutez les réponses de l'assistant (Text-to-Speech)
 - **Support français** : Reconnaissance vocale en français
+- **Animation visuelle** : Indicateur d'écoute avec halos pulsants
 
 ### 📅 Gestion d'Agenda
 - **3 types d'items** : Événements, tâches, rappels
@@ -83,6 +86,30 @@ Consultez [SETUP.md](./SETUP.md) pour :
 - Migration de la base de données
 - Variables d'environnement
 - Déploiement
+
+### 🎤 Wake Word "Hello Benji"
+
+Pour activer la détection vocale mains-libres :
+- **[WAKE_WORD_README.md](./WAKE_WORD_README.md)** : Vue d'ensemble et quick start
+- **[NEXT_STEPS_WAKE_WORD.md](./NEXT_STEPS_WAKE_WORD.md)** : Guide pas-à-pas (5 min)
+- **[WAKE_WORD_SETUP.md](./WAKE_WORD_SETUP.md)** : Configuration détaillée
+- **[IMPLEMENTATION_WAKE_WORD.md](./IMPLEMENTATION_WAKE_WORD.md)** : Documentation technique
+
+**Setup rapide** :
+```bash
+# 1. Configurer les dossiers
+npm run setup:wakeword
+
+# 2. Obtenir une clé gratuite sur console.picovoice.ai
+# 3. Créer le modèle "Hello Benji" (Français, Web)
+# 4. Ajouter dans .env.local :
+NEXT_PUBLIC_PICOVOICE_ACCESS_KEY=votre_clé
+
+# 5. Placer le modèle téléchargé :
+public/models/hello_benji.ppn
+```
+
+Dites **"Hello Benji"** → L'assistant s'active ! 🎉
 
 ## 🛠️ Stack Technique
 
