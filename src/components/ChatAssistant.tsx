@@ -38,8 +38,8 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [wakeWordEnabled, setWakeWordEnabled] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [continuousMode, setContinuousMode] = useState(false); // Mode conversation continue
-  const [showContinuousHelp, setShowContinuousHelp] = useState(false);
+  const [continuousMode, setContinuousMode] = useState(true); // Mode conversation continue activé par défaut
+  const [showContinuousHelp, setShowContinuousHelp] = useState(true); // Afficher l'aide au démarrage
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const voiceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,11 +54,12 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
 
   // Afficher l'aide lors de l'activation du mode continu
   useEffect(() => {
-    if (continuousMode && !showContinuousHelp) {
-      setShowContinuousHelp(true);
-      setTimeout(() => setShowContinuousHelp(false), 5000);
+    if (continuousMode) {
+      // Afficher l'aide pendant 8 secondes au démarrage
+      const timer = setTimeout(() => setShowContinuousHelp(false), 8000);
+      return () => clearTimeout(timer);
     }
-  }, [continuousMode, showContinuousHelp]);
+  }, [continuousMode]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -461,8 +462,8 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
             <div className="flex items-start gap-2">
               <Volume2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-semibold mb-1">Mode Conversation Activé ! 🎤</p>
-                <p className="text-xs">Parlez naturellement, attendez 1,5s de silence, et le message sera envoyé automatiquement. L'écoute reprend après chaque réponse.</p>
+                <p className="font-semibold mb-1">Conversation Ouverte Active ! 🎤</p>
+                <p className="text-xs">Je vous écoute en permanence. Parlez naturellement comme dans une conversation entre humains. Après 1,5s de silence, votre message sera automatiquement envoyé.</p>
               </div>
             </div>
           </motion.div>
