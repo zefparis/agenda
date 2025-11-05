@@ -10,6 +10,6 @@ if (!apiKey) {
 export const openai = apiKey ? new OpenAI({ apiKey }) : null;
 
 export const MODELS = {
-  PARSING: 'gpt-4o-mini',
-  ADVANCED: 'gpt-4o',
+  PARSING: 'gpt-5',
+  ADVANCED: 'gpt-5',
 } as const;

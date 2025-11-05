@@ -1,4 +1,4 @@
-import { openai } from '@/lib/openai/client';
+import { openai, MODELS } from '@/lib/openai/client';
 import { NextRequest } from 'next/server';
 
 function getAssistantPrompt(events: any[] = []) {
@@ -116,9 +116,9 @@ export async function POST(req: NextRequest) {
 
     console.log('💬 Chat request with', messages.length, 'messages');
 
-    // Appel à GPT-4 Turbo avec streaming
+    // Appel à GPT-4o avec streaming
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Utiliser gpt-4o-mini pour plus de rapidité et économie
+      model: MODELS.ADVANCED, // Utiliser gpt-4o pour plus de performance
       messages: [
         { role: 'system', content: getAssistantPrompt(events) },
         ...messages
