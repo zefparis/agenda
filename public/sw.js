@@ -4,7 +4,7 @@
  * Compatible Android / Samsung S23
  */
 
-const CACHE_NAME = 'agenda-ia-v2';
+const CACHE_NAME = 'agenda-ia-v3';
 const OFFLINE_URL = '/offline';
 
 // Fichiers à mettre en cache pour l'offline
