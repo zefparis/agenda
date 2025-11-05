@@ -31,6 +31,7 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showVoice, setShowVoice] = useState(false);
+  const [autoStartVoice, setAutoStartVoice] = useState(false); // Pour auto-démarrer après wake word
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [wakeWordEnabled, setWakeWordEnabled] = useState(true);
   
@@ -169,6 +170,7 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     
     setInput(transcript);
     setShowVoice(false);
+    setAutoStartVoice(false); // Réinitialiser l'auto-start
     
     // Auto-submit après transcription
     setTimeout(() => {
@@ -216,12 +218,13 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     console.log('🔥 Wake word détecté dans ChatAssistant');
     
     // TTS: Confirmation vocale
-    speakConfirmation('Oui Benji, je t\'écoute !');
+    speakConfirmation('Oui, je t\'écoute !');
     
-    // Activer la saisie vocale
+    // Activer la saisie vocale avec auto-start
     setShowVoice(true);
+    setAutoStartVoice(true);
     
-    // Timeout automatique après 10 secondes de silence
+    // Timeout automatique après 15 secondes de silence
     if (voiceTimeoutRef.current) {
       clearTimeout(voiceTimeoutRef.current);
     }
@@ -229,7 +232,8 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     voiceTimeoutRef.current = setTimeout(() => {
       console.log('⏱️ Timeout: fermeture automatique de la commande vocale');
       setShowVoice(false);
-    }, 10000);
+      setAutoStartVoice(false);
+    }, 15000);
   }, [speakConfirmation]);
 
   // Hook pour le wake word "Hello Benji"
@@ -417,7 +421,10 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
           {/* Voice Button */}
           <button
             type="button"
-            onClick={() => setShowVoice(!showVoice)}
+            onClick={() => {
+              setShowVoice(!showVoice);
+              setAutoStartVoice(false); // Ne pas auto-démarrer sur clic manuel
+            }}
             className="flex-shrink-0 p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
             title="Commande vocale"
           >
@@ -440,7 +447,10 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
         {/* Voice Input Modal */}
         {showVoice && (
           <div className="mt-3">
-            <VoiceInput onTranscript={handleVoiceTranscript} />
+            <VoiceInput 
+              onTranscript={handleVoiceTranscript} 
+              autoStart={autoStartVoice}
+            />
           </div>
         )}
       </form>

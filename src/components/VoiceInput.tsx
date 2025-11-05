@@ -7,9 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
   disabled?: boolean;
+  autoStart?: boolean; // Démarrer automatiquement l'écoute
 }
 
-export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
+export function VoiceInput({ onTranscript, disabled, autoStart }: VoiceInputProps) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(true);
@@ -66,6 +67,16 @@ export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
       }
     };
   }, [onTranscript]);
+
+  // Démarrer automatiquement si autoStart est true
+  useEffect(() => {
+    if (autoStart && recognitionRef.current && !isListening && !disabled) {
+      console.log('🎤 Auto-démarrage de la reconnaissance vocale...');
+      setTranscript('');
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  }, [autoStart, disabled, isListening]);
 
   const toggleListening = () => {
     if (!recognitionRef.current || disabled) return;
