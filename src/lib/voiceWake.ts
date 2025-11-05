@@ -37,20 +37,16 @@ export async function initWakeWord(
         {
           label: 'hello-benji',
           publicPath: config.modelPath,
-          customWritePath: config.modelPath,
           sensitivity: config.sensitivity || 0.5
         }
       ],
       // Callback de détection
-      (keywordLabel: any) => {
-        console.log('🔥 Wake word détecté: "Hello Benji"');
+      (detection) => {
+        console.log('🔥 Wake word détecté: "Hello Benji"', detection);
         callbacks.onWake();
       },
-      // Model options
-      {
-        publicPath: '/porcupine/',
-        forceWrite: false
-      }
+      // Model options (utilise les valeurs par défaut)
+      {}
     );
 
     isInitialized = true;

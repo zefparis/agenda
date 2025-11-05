@@ -64,11 +64,18 @@ cp ~/Downloads/hello_benji*.ppn public/models/hello_benji.ppn
 # Démarrer l'app
 npm run dev
 
-# Ouvrir http://localhost:3000
+# Option 1 : Page de test dédiée
+http://localhost:3000/testWake
+
+# Option 2 : Dans l'app principale
+http://localhost:3000
+
 # Autoriser le microphone
 # Dire "Hello Benji"
 # 🎉 Ça marche !
 ```
+
+**📋 Recommandé** : Tester d'abord sur `/testWake` (interface de debug)
 
 ---
 
@@ -77,6 +84,7 @@ npm run dev
 | Document | Contenu | Temps |
 |----------|---------|-------|
 | **[NEXT_STEPS_WAKE_WORD.md](./NEXT_STEPS_WAKE_WORD.md)** | 👉 **Guide détaillé pas-à-pas** | 5 min |
+| [TEST_WAKE_WORD.md](./TEST_WAKE_WORD.md) | 🧪 Page de test dédiée | 2 min |
 | [WAKE_WORD_README.md](./WAKE_WORD_README.md) | Vue d'ensemble et exemples | 3 min |
 | [WAKE_WORD_SETUP.md](./WAKE_WORD_SETUP.md) | Configuration avancée | 10 min |
 | [IMPLEMENTATION_WAKE_WORD.md](./IMPLEMENTATION_WAKE_WORD.md) | Documentation technique | 15 min |
