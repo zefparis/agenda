@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { PWAProvider } from "@/components/PWAProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,7 +15,26 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Mon Agenda Intelligent",
-  description: "Agenda personnel intelligent avec parsing en langage naturel",
+  description: "Assistant personnel avec wake word 'Hello Benji' et gestion d'agenda intelligente",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Agenda IA",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  themeColor: "#3b82f6",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
@@ -48,7 +68,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <PWAProvider>
+          {children}
+        </PWAProvider>
       </body>
     </html>
   );

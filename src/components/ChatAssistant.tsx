@@ -7,7 +7,9 @@ import { VoiceInput } from './VoiceInput';
 import { ActionButton } from './ActionButton';
 import { FavoriteLinks } from './FavoriteLinks';
 import { WakeIndicator } from './WakeIndicator';
+import { PermissionBanner } from './PermissionBanner';
 import { useWakeWord } from '@/hooks/useWakeWord';
+import { useWakeWordMobile } from '@/hooks/useWakeWordMobile';
 import { parseAction, cleanMessage } from '@/lib/chatActions';
 import { parseExternalActions, cleanExternalActionFromMessage, hasExternalAction } from '@/lib/externalActions';
 import { formatMessageWithLinks } from '@/lib/linkify';
@@ -34,9 +36,18 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   const [autoStartVoice, setAutoStartVoice] = useState(false); // Pour auto-démarrer après wake word
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [wakeWordEnabled, setWakeWordEnabled] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const voiceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Détecter si mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+    checkMobile();
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -236,15 +247,28 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     }, 15000);
   }, [speakConfirmation]);
 
-  // Hook pour le wake word "Hello Benji"
-  const wakeWord = useWakeWord({
+  // Hook pour le wake word "Hello Benji" (desktop)
+  const wakeWordDesktop = useWakeWord({
     accessKey: process.env.NEXT_PUBLIC_PICOVOICE_ACCESS_KEY || '',
     modelPath: '/models/hello_benji.ppn',
     sensitivity: 0.5,
-    enabled: wakeWordEnabled,
+    enabled: wakeWordEnabled && !isMobile,
     onWake: handleWakeDetection,
     autoStart: true
   });
+
+  // Hook pour le wake word "Hello Benji" (mobile)
+  const wakeWordMobile = useWakeWordMobile({
+    accessKey: process.env.NEXT_PUBLIC_PICOVOICE_ACCESS_KEY || '',
+    modelPath: '/models/hello_benji.ppn',
+    sensitivity: 0.5,
+    enabled: wakeWordEnabled && isMobile,
+    onWake: handleWakeDetection,
+    autoStart: true
+  });
+
+  // Sélectionner le bon hook selon la plateforme
+  const wakeWord = isMobile ? wakeWordMobile : wakeWordDesktop;
 
   return (
     <div className="flex flex-col h-[calc(100vh-200px)] md:h-[calc(100vh-200px)] sm:h-[calc(100vh-150px)] bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-gray-200 dark:border-gray-700">
@@ -400,6 +424,15 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
 
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Permission Banner (mobile uniquement) */}
+      {isMobile && 'requestPermission' in wakeWord && (
+        <PermissionBanner
+          hasPermission={wakeWord.isInitialized}
+          onRequestPermission={wakeWord.requestPermission}
+          platform={wakeWord.platform || 'android'}
+        />
+      )}
 
       {/* Wake Word Indicator */}
       <WakeIndicator 
