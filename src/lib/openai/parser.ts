@@ -68,6 +68,7 @@ export async function parseNaturalLanguage(input: string): Promise<ParsedCommand
         { role: 'user', content: input }
       ],
       temperature: 0.2, // Plus bas pour plus de précision
+      max_completion_tokens: 500, // Limite pour le parsing (GPT-5)
       response_format: { type: 'json_object' },
     });
 
