@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Loader2, Trash2, Bot, User, Mic, Calendar, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VoiceInput } from './VoiceInput';
+import { ContinuousVoiceInput } from './ContinuousVoiceInput';
 import { ActionButton } from './ActionButton';
 import { FavoriteLinks } from './FavoriteLinks';
 import { WakeIndicator } from './WakeIndicator';
@@ -37,6 +38,8 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [wakeWordEnabled, setWakeWordEnabled] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [continuousMode, setContinuousMode] = useState(false); // Mode conversation continue
+  const [showContinuousHelp, setShowContinuousHelp] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const voiceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -48,6 +51,14 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     };
     checkMobile();
   }, []);
+
+  // Afficher l'aide lors de l'activation du mode continu
+  useEffect(() => {
+    if (continuousMode && !showContinuousHelp) {
+      setShowContinuousHelp(true);
+      setTimeout(() => setShowContinuousHelp(false), 5000);
+    }
+  }, [continuousMode, showContinuousHelp]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -183,10 +194,8 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     setShowVoice(false);
     setAutoStartVoice(false); // Réinitialiser l'auto-start
     
-    // Auto-submit après transcription
-    setTimeout(() => {
-      handleSubmit(null as any, { data: transcript });
-    }, 100);
+    // Auto-submit immédiatement après transcription
+    handleSubmit(null as any, { data: transcript });
   };
 
   const speak = (text: string, messageId: string) => {
@@ -279,7 +288,7 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
             <Bot className="w-6 h-6" />
             <div>
               <h2 className="text-base sm:text-lg font-bold">Assistant IA</h2>
-              <p className="text-xs text-blue-100 hidden sm:block">GPT-4o Mini • En ligne</p>
+              <p className="text-xs text-blue-100 hidden sm:block">GPT-5 • En ligne</p>
             </div>
           </div>
           {messages.length > 0 && (
@@ -440,6 +449,26 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
         isWakeDetected={wakeWord.isWakeDetected}
       />
 
+      {/* Continuous Mode Help */}
+      <AnimatePresence>
+        {showContinuousHelp && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="mx-3 sm:mx-4 mb-2 p-3 bg-green-50 dark:bg-green-900/30 border-2 border-green-300 dark:border-green-700 rounded-xl text-sm text-green-800 dark:text-green-200"
+          >
+            <div className="flex items-start gap-2">
+              <Volume2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-semibold mb-1">Mode Conversation Activé ! 🎤</p>
+                <p className="text-xs">Parlez naturellement, attendez 1,5s de silence, et le message sera envoyé automatiquement. L'écoute reprend après chaque réponse.</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex gap-1.5 sm:gap-2">
@@ -463,6 +492,16 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
           >
             <Mic className="w-5 h-5" />
           </button>
+
+          {/* Continuous Mode Button */}
+          <div className="flex-shrink-0">
+            <ContinuousVoiceInput
+              onTranscript={handleVoiceTranscript}
+              isAssistantSpeaking={isLoading}
+              enabled={continuousMode}
+              onToggle={() => setContinuousMode(!continuousMode)}
+            />
+          </div>
 
           <button
             type="submit"

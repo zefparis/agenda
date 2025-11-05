@@ -35,18 +35,16 @@ export function CommandInput({ onCommandSubmit }: CommandInputProps) {
     console.log('🎤 Voice command received:', transcript);
     setCommand(transcript);
     
-    // Soumettre automatiquement après transcription
-    setTimeout(async () => {
-      setIsLoading(true);
-      try {
-        await onCommandSubmit(transcript);
-        setCommand('');
-      } catch (error) {
-        console.error('Error submitting voice command:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 500);
+    // Soumettre immédiatement après transcription
+    setIsLoading(true);
+    try {
+      await onCommandSubmit(transcript);
+      setCommand('');
+    } catch (error) {
+      console.error('Error submitting voice command:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
