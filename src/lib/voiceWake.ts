@@ -67,7 +67,9 @@ export async function initWakeWord(
         console.log('🔥 Wake word détecté: "Hello Benji"', detection);
         callbacks.onWake();
       },
-      // Model options (utilise les valeurs par défaut)
+      // Modèle Porcupine français (fichier .pv)
+      { publicPath: '/models/porcupine_params_fr.pv' },
+      // Options
       {}
     );
 

@@ -1,4 +1,4 @@
-# ✅ Correction : Chargement modèle en base64
+# ✅ Correction : Modèle Porcupine principal manquant
 
 ## 🐛 Erreur corrigée
 
@@ -10,43 +10,53 @@ The provided model doesn't contain a valid publicPath or base64 value
 
 ### Problème
 
-Porcupine ne pouvait pas charger le modèle via `publicPath: "/models/hello_benji.ppn"`
+Porcupine nécessite **2 fichiers distincts**:
+1. **Modèle principal** (`porcupine_params.pv`) - 962KB - Modèle de base Porcupine
+2. **Keyword custom** (`hello_benji.ppn`) - 3KB - Notre wake word spécifique
+
+Le 4ème paramètre de `PorcupineWorker.create()` doit être le modèle principal, pas les options!
 
 ### Solution
 
-Charger le modèle en **base64** au lieu de publicPath.
+1. **Télécharger le modèle Porcupine principal**
+2. **Passer le modèle en 4ème paramètre**
+3. **Charger le keyword en base64** (plus fiable que publicPath)
 
 **Fichier modifié** : `src/app/testWake/page.tsx`
 
 **Changement** :
 
 ```typescript
-// ❌ Avant (ne fonctionnait pas)
-{
-  label: "hello_benji",
-  publicPath: "/models/hello_benji.ppn",
-  sensitivity: 0.5
-}
-
-// ✅ Après (fonctionne)
-// 1. Charger le fichier .ppn
-const modelResponse = await fetch("/models/hello_benji.ppn");
-const modelArrayBuffer = await modelResponse.arrayBuffer();
-
-// 2. Convertir en base64
-const modelBase64 = btoa(
-  new Uint8Array(modelArrayBuffer).reduce(
-    (data, byte) => data + String.fromCharCode(byte),
-    ""
-  )
+// ❌ Avant (manquait le modèle principal)
+porcupineInstance = await PorcupineWorker.create(
+  accessKey,
+  [{ label: "hello_benji", base64: modelBase64, sensitivity: 0.5 }],
+  callback,
+  {}  // ❌ Options passées ici au lieu du modèle!
 );
 
-// 3. Utiliser avec Porcupine
-{
-  label: "hello_benji",
-  base64: modelBase64,  // ← base64 au lieu de publicPath
-  sensitivity: 0.5
+// ✅ Après (fonctionne)
+// 1. Télécharger porcupine_params.pv dans public/models/
+// 2. Charger le keyword en base64
+const modelResponse = await fetch("/models/hello_benji.ppn");
+const modelArrayBuffer = await modelResponse.arrayBuffer();
+const bytes = new Uint8Array(modelArrayBuffer);
+let binary = '';
+const chunkSize = 0x8000; // 32KB chunks
+for (let i = 0; i < bytes.length; i += chunkSize) {
+  const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+  binary += String.fromCharCode.apply(null, Array.from(chunk));
 }
+const modelBase64 = btoa(binary);
+
+// 3. Créer l'instance avec le modèle principal
+porcupineInstance = await PorcupineWorker.create(
+  accessKey,
+  [{ label: "hello_benji", base64: modelBase64, sensitivity: 0.5 }],
+  callback,
+  { publicPath: "/models/porcupine_params.pv" },  // ✅ Modèle principal!
+  {}  // Options
+);
 ```
 
 ## 🚀 Test maintenant
@@ -66,9 +76,9 @@ http://localhost:3000/testWake
 Console navigateur (F12) :
 
 ```javascript
-🔧 Chargement du modèle…
-[Fetch du fichier .ppn]
-[Conversion en base64]
+📥 Fetching model from /models/hello_benji.ppn
+✅ Model loaded: 3040 bytes
+✅ Base64 encoded: 4056 characters
 ✅ Porcupine initialisé avec succès
 🎧 Écoute du wake word activée
 
@@ -76,15 +86,25 @@ Console navigateur (F12) :
 🔥 Hello Benji détecté ! {...}
 ```
 
-## ✅ Avantages de base64
+## 📁 Fichiers requis
 
-1. **Plus fiable** : Pas de problème de chemin HTTP
-2. **Portable** : Le modèle est chargé une fois et converti
-3. **Compatible** : Fonctionne avec tous les navigateurs
+Dans `public/models/`:
+- ✅ `hello_benji.ppn` (3KB) - Keyword custom "Hello Benji"
+- ✅ `porcupine_params.pv` (962KB) - Modèle Porcupine principal
+
+```bash
+# Pour télécharger le modèle principal:
+curl -o public/models/porcupine_params.pv \
+  https://raw.githubusercontent.com/Picovoice/porcupine/master/lib/common/porcupine_params.pv
+```
 
 ## 📝 Note
 
-Cette approche charge le fichier `.ppn` via `fetch()`, le convertit en base64, puis l'envoie à Porcupine. C'est la méthode recommandée pour les modèles personnalisés dans Next.js.
+**Porcupine nécessite 2 modèles**:
+1. **Modèle principal** (`.pv`) - Neural network de base pour la détection
+2. **Keyword custom** (`.ppn`) - Pattern spécifique du wake word
+
+Le 4ème paramètre de `PorcupineWorker.create()` est obligatoire et doit pointer vers le modèle principal!
 
 ---
 

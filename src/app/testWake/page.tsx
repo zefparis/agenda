@@ -60,7 +60,8 @@ export default function TestWake() {
             setDetected(true);
             setTimeout(() => setDetected(false), 2000);
           },
-          {} // Options du modèle (utilise les valeurs par défaut)
+          { publicPath: "/models/porcupine_params_fr.pv" }, // Modèle Porcupine français
+          {} // Options
         );
 
         setStatus("🎧 En écoute du mot-clé : Hello Benji");
