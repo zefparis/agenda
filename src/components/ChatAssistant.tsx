@@ -360,24 +360,24 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex gap-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {message.role === 'assistant' && (
-                <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <Bot className="w-5 h-5 text-white" />
+                <div className="flex-shrink-0 w-11 h-11 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                  <Bot className="w-6 h-6 text-white" />
                 </div>
               )}
               
-              <div className="flex flex-col gap-2 max-w-[80%]">
+              <div className="flex flex-col gap-2 max-w-[85%]">
                 <div
-                  className={`px-4 py-3 rounded-2xl ${
+                  className={`px-5 py-4 rounded-2xl shadow-lg ${
                     message.role === 'user'
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                      : 'bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-gray-600'
                   }`}
                 >
                   <div 
-                    className="message-content text-sm whitespace-pre-wrap [&_a]:pointer-events-auto [&_a]:relative [&_a]:z-10"
+                    className="message-content text-base leading-relaxed whitespace-pre-wrap [&_a]:pointer-events-auto [&_a]:relative [&_a]:z-10"
                     dangerouslySetInnerHTML={{ __html: formatMessageWithLinks(message.content) }}
                   />
                 </div>
@@ -385,17 +385,17 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
                 {message.role === 'assistant' && message.content && (
                   <button
                     onClick={() => speak(message.content, message.id)}
-                    className="self-start px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300"
+                    className="self-start px-4 py-2.5 rounded-xl bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors flex items-center gap-2 text-sm font-semibold text-white shadow-md"
                     title={speakingId === message.id ? 'Arrêter la lecture' : 'Lire à voix haute'}
                   >
                     {speakingId === message.id ? (
                       <>
-                        <VolumeX className="w-3.5 h-3.5" />
+                        <VolumeX className="w-5 h-5" />
                         <span>Arrêter</span>
                       </>
                     ) : (
                       <>
-                        <Volume2 className="w-3.5 h-3.5" />
+                        <Volume2 className="w-5 h-5" />
                         <span>Écouter</span>
                       </>
                     )}
@@ -409,8 +409,8 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
               </div>
 
               {message.role === 'user' && (
-                <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-green-500 to-teal-600 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
+                <div className="flex-shrink-0 w-11 h-11 bg-gradient-to-br from-green-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg">
+                  <User className="w-6 h-6 text-white" />
                 </div>
               )}
             </motion.div>
@@ -482,9 +482,17 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
       </AnimatePresence>
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700">
+        {/* Zone de transcription au-dessus */}
+        <ContinuousVoiceInput
+          onTranscript={handleVoiceTranscript}
+          isAssistantSpeaking={isLoading}
+          enabled={continuousMode}
+          onToggle={() => setContinuousMode(!continuousMode)}
+        />
+
         {/* Boutons vocaux en haut sur 2 colonnes */}
-        <div className="flex gap-2 mb-3">
+        <div className="flex gap-3 mb-4 mt-3">
           {/* Voice Button */}
           <button
             type="button"
@@ -492,45 +500,59 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
               setShowVoice(!showVoice);
               setAutoStartVoice(false);
             }}
-            className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+            className="flex-1 px-5 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-base hover:from-purple-700 hover:to-pink-700 transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2"
             title="Commande vocale ponctuelle"
           >
-            <Mic className="w-5 h-5" />
-            <span className="text-sm">Vocal</span>
+            <Mic className="w-6 h-6" />
+            <span>Vocal</span>
           </button>
 
-          {/* Continuous Mode Button */}
-          <div className="flex-1">
-            <ContinuousVoiceInput
-              onTranscript={handleVoiceTranscript}
-              isAssistantSpeaking={isLoading}
-              enabled={continuousMode}
-              onToggle={() => setContinuousMode(!continuousMode)}
-            />
-          </div>
+          {/* Continuous Mode Toggle - Juste le bouton sans la transcription */}
+          <button
+            type="button"
+            onClick={() => setContinuousMode(!continuousMode)}
+            className={`flex-1 px-5 py-4 rounded-2xl font-bold text-base transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2 ${
+              continuousMode
+                ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white animate-pulse'
+                : 'bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white'
+            }`}
+            title={continuousMode ? 'Désactiver le mode conversation continue' : 'Activer le mode conversation continue'}
+          >
+            {continuousMode ? (
+              <>
+                <Volume2 className="w-6 h-6" />
+                <span>Écoute Active</span>
+              </>
+            ) : (
+              <>
+                <Mic className="w-6 h-6" />
+                <span>Mode Continu</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Input et bouton d'envoi */}
-        <div className="flex gap-1.5 sm:gap-2">
+        <div className="flex gap-3">
           <input
             value={input}
             onChange={handleInputChange}
             placeholder="Posez votre question..."
             disabled={isLoading}
-            className="flex-1 min-w-0 px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none transition-colors"
+            className="flex-1 min-w-0 px-5 py-4 text-lg rounded-2xl border-3 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
           />
 
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="flex-shrink-0 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white font-semibold hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 dark:disabled:from-gray-700 dark:disabled:to-gray-600 transition-all shadow-lg hover:shadow-xl flex items-center gap-2"
+            className="flex-shrink-0 px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white font-bold text-base hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 dark:disabled:from-gray-700 dark:disabled:to-gray-600 transition-all shadow-xl hover:shadow-2xl flex items-center gap-2 min-w-[120px] justify-center"
           >
             {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-6 h-6 animate-spin" />
             ) : (
               <>
-                <Send className="w-5 h-5" />
-                <span className="hidden sm:inline text-sm">Envoyer</span>
+                <Send className="w-6 h-6" />
+                <span>Envoyer</span>
               </>
             )}
           </button>

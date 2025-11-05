@@ -161,56 +161,44 @@ export function ContinuousVoiceInput({
   }
 
   return (
-    <div className="relative w-full">
-      <motion.button
-        type="button"
-        onClick={onToggle}
-        whileTap={{ scale: 0.95 }}
-        className={`w-full px-4 py-2.5 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-sm ${
-          enabled
-            ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white animate-pulse'
-            : 'bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white'
-        }`}
-        title={enabled ? 'Désactiver le mode conversation continue' : 'Activer le mode conversation continue'}
-      >
-        {enabled ? (
-          <>
-            <Volume2 className="w-5 h-5" />
-            <span className="text-sm">Écoute Active</span>
-          </>
-        ) : (
-          <>
-            <Mic className="w-5 h-5" />
-            <span className="text-sm">Mode Continu</span>
-          </>
-        )}
-      </motion.button>
-
-      {/* Indicateur d'écoute */}
-      <AnimatePresence>
-        {isListening && !isAssistantSpeaking && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full animate-pulse"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Transcript en cours */}
+    <div className="w-full mb-2">
+      {/* Zone de transcription AU-DESSUS - bien visible */}
       <AnimatePresence>
         {transcript && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full mt-2 left-0 right-0 min-w-[200px] p-3 bg-green-100 dark:bg-green-900/50 border-2 border-green-300 dark:border-green-700 rounded-xl text-sm text-green-900 dark:text-green-100"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-3 p-4 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/50 dark:to-emerald-900/50 border-3 border-green-400 dark:border-green-600 rounded-2xl shadow-lg"
           >
-            <div className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="italic">{transcript}</span>
+            <div className="flex items-start gap-3">
+              <Loader2 className="w-6 h-6 animate-spin text-green-600 dark:text-green-400 flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-green-800 dark:text-green-300 mb-1">
+                  🎤 Vous dites :
+                </p>
+                <p className="text-base font-medium text-green-900 dark:text-green-100 leading-relaxed">
+                  {transcript}
+                </p>
+              </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Indicateur d'écoute en mode continu */}
+      <AnimatePresence>
+        {isListening && !isAssistantSpeaking && enabled && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-3 p-3 bg-red-50 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-700 rounded-xl flex items-center gap-2"
+          >
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <span className="text-sm font-semibold text-red-700 dark:text-red-300">
+              En écoute... Parlez maintenant
+            </span>
           </motion.div>
         )}
       </AnimatePresence>
