@@ -38,8 +38,8 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [wakeWordEnabled, setWakeWordEnabled] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const [continuousMode, setContinuousMode] = useState(true); // Mode conversation continue activé par défaut
-  const [showContinuousHelp, setShowContinuousHelp] = useState(true); // Afficher l'aide au démarrage
+  const [continuousMode, setContinuousMode] = useState(false); // Mode conversation continue désactivé par défaut
+  const [showContinuousHelp, setShowContinuousHelp] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const voiceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -55,9 +55,12 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
   // Afficher l'aide lors de l'activation du mode continu
   useEffect(() => {
     if (continuousMode) {
-      // Afficher l'aide pendant 8 secondes au démarrage
+      setShowContinuousHelp(true);
+      // Afficher l'aide pendant 8 secondes
       const timer = setTimeout(() => setShowContinuousHelp(false), 8000);
       return () => clearTimeout(timer);
+    } else {
+      setShowContinuousHelp(false);
     }
   }, [continuousMode]);
 
@@ -316,9 +319,17 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
             <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
               Bonjour ! 👋
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+            <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-3">
               Je suis votre assistant personnel. Posez-moi des questions ou demandez-moi de gérer votre agenda !
             </p>
+            
+            {/* Info Mode Continu */}
+            <div className="max-w-md mx-auto mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                💡 <strong>Astuce :</strong> Activez le bouton <strong>"Mode Continu"</strong> en bas pour avoir une conversation ouverte. Je vous écouterai en permanence sans besoin de cliquer !
+              </p>
+            </div>
+            
             <div className="mt-6 flex flex-wrap gap-2 justify-center">
               {[
                 '📅 Crée un rdv demain 14h',
@@ -462,8 +473,8 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
             <div className="flex items-start gap-2">
               <Volume2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-semibold mb-1">Conversation Ouverte Active ! 🎤</p>
-                <p className="text-xs">Je vous écoute en permanence. Parlez naturellement comme dans une conversation entre humains. Après 0,7s de silence, votre message sera automatiquement envoyé.</p>
+                <p className="font-semibold mb-1">Mode Conversation Continue Activé ! 🎤</p>
+                <p className="text-xs">Je vous écoute en permanence. Parlez naturellement, après 0,7s de silence votre message sera automatiquement envoyé. Vous pouvez désactiver ce mode avec le bouton vert "Écoute Active".</p>
               </div>
             </div>
           </motion.div>
