@@ -539,7 +539,7 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
             onChange={handleInputChange}
             placeholder="Posez votre question..."
             disabled={isLoading}
-            className="flex-1 min-w-0 px-5 py-4 text-lg rounded-2xl border-3 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            className="flex-1 min-w-0 px-5 py-4 text-lg rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
           />
 
           <button

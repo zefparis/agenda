@@ -169,7 +169,7 @@ export function ContinuousVoiceInput({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mb-3 p-4 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/50 dark:to-emerald-900/50 border-3 border-green-400 dark:border-green-600 rounded-2xl shadow-lg"
+            className="mb-3 p-4 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/50 dark:to-emerald-900/50 border-2 border-green-400 dark:border-green-600 rounded-2xl shadow-lg"
           >
             <div className="flex items-start gap-3">
               <Loader2 className="w-6 h-6 animate-spin text-green-600 dark:text-green-400 flex-shrink-0 mt-1" />
