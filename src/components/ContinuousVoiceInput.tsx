@@ -23,6 +23,7 @@ export function ContinuousVoiceInput({
   const recognitionRef = useRef<any>(null);
   const restartTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTranscriptRef = useRef<string>('');
 
   useEffect(() => {
     // Vérifier si Web Speech API est supportée
@@ -51,19 +52,22 @@ export function ContinuousVoiceInput({
           .join('');
         
         setTranscript(currentTranscript);
+        lastTranscriptRef.current = currentTranscript;
 
-        // Si le résultat est final, attendre un peu pour voir s'il y a plus de parole
+        // Si le résultat est final, envoyer rapidement
         if (event.results[event.results.length - 1].isFinal) {
           console.log('🎤 Final transcript detected:', currentTranscript);
           
-          // Attendre 1.5 secondes de silence avant d'envoyer
+          // Réduire le délai à 700ms pour plus de réactivité
           silenceTimeoutRef.current = setTimeout(() => {
-            if (currentTranscript.trim()) {
-              console.log('🎤 Sending transcript after silence:', currentTranscript);
-              onTranscript(currentTranscript);
+            const finalText = lastTranscriptRef.current.trim();
+            if (finalText) {
+              console.log('🎤 Sending transcript:', finalText);
+              onTranscript(finalText);
               setTranscript('');
+              lastTranscriptRef.current = '';
             }
-          }, 1500);
+          }, 700);
         }
       };
 
@@ -90,7 +94,7 @@ export function ContinuousVoiceInput({
         console.log('🎤 Recognition ended');
         setIsListening(false);
         
-        // Redémarrer automatiquement si le mode continu est activé
+        // Redémarrer rapidement en mode continu
         if (enabled && !isAssistantSpeaking) {
           console.log('🔄 Auto-restarting recognition...');
           restartTimeoutRef.current = setTimeout(() => {
@@ -102,7 +106,7 @@ export function ContinuousVoiceInput({
                 console.error('Failed to auto-restart:', err);
               }
             }
-          }, 300);
+          }, 100);
         }
       };
 

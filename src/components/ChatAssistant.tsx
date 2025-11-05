@@ -463,7 +463,7 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
               <Volume2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-semibold mb-1">Conversation Ouverte Active ! 🎤</p>
-                <p className="text-xs">Je vous écoute en permanence. Parlez naturellement comme dans une conversation entre humains. Après 1,5s de silence, votre message sera automatiquement envoyé.</p>
+                <p className="text-xs">Je vous écoute en permanence. Parlez naturellement comme dans une conversation entre humains. Après 0,7s de silence, votre message sera automatiquement envoyé.</p>
               </div>
             </div>
           </motion.div>
