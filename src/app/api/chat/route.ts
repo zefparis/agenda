@@ -123,7 +123,6 @@ export async function POST(req: NextRequest) {
         { role: 'system', content: getAssistantPrompt(events) },
         ...messages
       ],
-      temperature: 0.7,
       max_completion_tokens: 2000, // Nouveau paramètre pour GPT-5
       stream: true,
     });
