@@ -38,14 +38,19 @@ export async function initWakeWord(
     }
     
     const modelArrayBuffer = await modelResponse.arrayBuffer();
-    const modelBase64 = btoa(
-      new Uint8Array(modelArrayBuffer).reduce(
-        (data, byte) => data + String.fromCharCode(byte),
-        ""
-      )
-    );
+    console.log(`✅ Modèle chargé: ${modelArrayBuffer.byteLength} bytes`);
     
-    console.log('✅ Modèle chargé et converti en base64');
+    // Conversion base64 robuste pour données binaires
+    const bytes = new Uint8Array(modelArrayBuffer);
+    let binary = '';
+    const chunkSize = 0x8000; // 32KB chunks to avoid call stack size exceeded
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+      binary += String.fromCharCode.apply(null, Array.from(chunk));
+    }
+    const modelBase64 = btoa(binary);
+    
+    console.log('✅ Modèle converti en base64');
 
     // Créer une instance Porcupine avec le modèle en base64
     porcupineInstance = await PorcupineWorker.create(

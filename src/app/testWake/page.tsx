@@ -25,17 +25,25 @@ export default function TestWake() {
         setStatus("🔧 Chargement du modèle…");
 
         // Charger le modèle en tant que base64
+        console.log('📥 Fetching model from /models/hello_benji.ppn');
         const modelResponse = await fetch("/models/hello_benji.ppn");
         if (!modelResponse.ok) {
-          throw new Error("Impossible de charger le modèle hello_benji.ppn");
+          throw new Error(`Impossible de charger le modèle: ${modelResponse.status} ${modelResponse.statusText}`);
         }
+        
         const modelArrayBuffer = await modelResponse.arrayBuffer();
-        const modelBase64 = btoa(
-          new Uint8Array(modelArrayBuffer).reduce(
-            (data, byte) => data + String.fromCharCode(byte),
-            ""
-          )
-        );
+        console.log(`✅ Model loaded: ${modelArrayBuffer.byteLength} bytes`);
+        
+        // Conversion base64 robuste pour données binaires
+        const bytes = new Uint8Array(modelArrayBuffer);
+        let binary = '';
+        const chunkSize = 0x8000; // 32KB chunks to avoid call stack size exceeded
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+          binary += String.fromCharCode.apply(null, Array.from(chunk));
+        }
+        const modelBase64 = btoa(binary);
+        console.log(`✅ Base64 encoded: ${modelBase64.length} characters`);
 
         // Créer l'instance Porcupine avec le modèle en base64
         porcupineInstance = await PorcupineWorker.create(
