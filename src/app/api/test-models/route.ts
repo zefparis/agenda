@@ -10,13 +10,14 @@ export async function GET() {
   }
 
   try {
-    // Tester GPT-5
+    // Tester GPT-4-Turbo
     const testResponse = await openai.chat.completions.create({
       model: MODELS.ADVANCED,
       messages: [
-        { role: 'user', content: 'Hello, what model are you?' }
+        { role: 'user', content: 'Hello, respond with just your model name and version' }
       ],
-      max_completion_tokens: 50,
+      max_tokens: 50,
+      temperature: 0.1,
     });
 
     return NextResponse.json({

@@ -10,6 +10,12 @@ if (!apiKey) {
 export const openai = apiKey ? new OpenAI({ apiKey }) : null;
 
 export const MODELS = {
-  PARSING: 'gpt-4o', // Modèle le plus rapide d'OpenAI
-  ADVANCED: 'gpt-4o', // Optimisé pour le streaming
+  PARSING: 'gpt-4-turbo-preview', // Pour le parsing JSON structuré
+  ADVANCED: 'gpt-4-turbo-preview', // Pour les conversations
+} as const;
+
+// Configuration commune pour éviter les erreurs
+export const COMMON_CONFIG = {
+  temperature: 0.7,
+  max_tokens: 2000, // Utiliser max_tokens au lieu de max_completion_tokens
 } as const;

@@ -116,17 +116,16 @@ export async function POST(req: NextRequest) {
 
     console.log('💬 Chat request with', messages.length, 'messages');
 
-    // Appel à GPT-4o avec streaming optimisé
+    // Appel à GPT-4-Turbo avec streaming
     const response = await openai.chat.completions.create({
-      model: MODELS.ADVANCED, // GPT-4o (le plus rapide)
+      model: MODELS.ADVANCED,
       messages: [
         { role: 'system', content: getAssistantPrompt(events) },
         ...messages
       ],
-      max_completion_tokens: 2000,
-      temperature: 0.7, // Équilibre entre créativité et cohérence
+      max_tokens: 2000,
+      temperature: 0.7,
       stream: true,
-      stream_options: { include_usage: false }, // Désactiver usage pour stream plus rapide
     });
 
     // Créer un stream de réponse

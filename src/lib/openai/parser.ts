@@ -59,7 +59,7 @@ export async function parseNaturalLanguage(input: string): Promise<ParsedCommand
   }
 
   try {
-    console.log('🤖 Parsing with OpenAI:', input);
+    console.log('🤖 Parsing with OpenAI GPT-4-Turbo:', input);
     
     const completion = await openai.chat.completions.create({
       model: MODELS.PARSING,
@@ -67,7 +67,8 @@ export async function parseNaturalLanguage(input: string): Promise<ParsedCommand
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: input }
       ],
-      max_completion_tokens: 500, // Limite pour le parsing (GPT-5)
+      max_tokens: 500, // Limite pour le parsing
+      temperature: 0.3, // Faible température pour parsing précis
       response_format: { type: 'json_object' },
     });
 
