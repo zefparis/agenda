@@ -2,9 +2,14 @@
  * Service Worker pour Mon Agenda Intelligent
  * Gère le cache, les notifications et maintient le contexte audio
  * Compatible Android / Samsung S23
+ * 
+ * HISTORIQUE DES VERSIONS:
+ * v6 (6 nov 2025) : GPT-4-Turbo + corrections OpenAI
+ * v5 (6 nov 2025) : Fallback microphone mobile
+ * v4 (5 nov 2025) : Wake word optimisé
  */
 
-const CACHE_NAME = 'agenda-ia-v5'; // Incrémenté pour fallback micro
+const CACHE_NAME = 'agenda-ia-v6'; // GPT-4-Turbo + corrections OpenAI
 const OFFLINE_URL = '/offline';
 
 // Fichiers à mettre en cache pour l'offline
@@ -39,7 +44,7 @@ self.addEventListener('install', (event) => {
 // ACTIVATION
 // ========================================
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activation');
+  console.log('[SW] Activation v6 - GPT-4-Turbo');
   
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -51,6 +56,18 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
+    }).then(() => {
+      // Forcer le refresh de tous les clients pour charger la nouvelle config OpenAI
+      return self.clients.matchAll({ type: 'window' }).then(clients => {
+        clients.forEach(client => {
+          console.log('[SW] Demande de reload au client');
+          client.postMessage({
+            type: 'SW_UPDATED',
+            version: 'v6',
+            changes: 'GPT-4-Turbo activé'
+          });
+        });
+      });
     })
   );
   
