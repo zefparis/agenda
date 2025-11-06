@@ -10,6 +10,6 @@ if (!apiKey) {
 export const openai = apiKey ? new OpenAI({ apiKey }) : null;
 
 export const MODELS = {
-  PARSING: 'gpt-5',
-  ADVANCED: 'gpt-5',
+  PARSING: 'gpt-4o', // Modèle le plus rapide d'OpenAI
+  ADVANCED: 'gpt-4o', // Optimisé pour le streaming
 } as const;

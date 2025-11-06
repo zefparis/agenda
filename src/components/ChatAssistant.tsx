@@ -102,6 +102,10 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     setError(null);
 
     try {
+      // Timeout pour éviter les attentes trop longues
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 secondes max
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -112,7 +116,10 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
           })),
           events: events // Passer les événements pour contexte
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -130,19 +137,22 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
       let assistantMessage = '';
       const assistantId = Date.now().toString();
 
+      // Créer le message assistant immédiatement
       setMessages(prev => [...prev, {
         id: assistantId,
         role: 'assistant',
         content: ''
       }]);
 
+      // Lire le stream et mettre à jour en temps réel
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value);
+        const chunk = decoder.decode(value, { stream: true });
         assistantMessage += chunk;
 
+        // Mettre à jour immédiatement pour un streaming fluide
         setMessages(prev => prev.map(m =>
           m.id === assistantId ? { ...m, content: assistantMessage } : m
         ));
@@ -177,7 +187,19 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
 
     } catch (err) {
       console.error('Chat error:', err);
-      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      
+      // Gestion spécifique des erreurs
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          setError('⏱️ Temps de réponse dépassé. Réessayez avec une question plus courte.');
+        } else if (err.message.includes('fetch')) {
+          setError('🌐 Problème de connexion. Vérifiez votre réseau.');
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError('❌ Erreur inconnue');
+      }
     } finally {
       setIsLoading(false);
     }
