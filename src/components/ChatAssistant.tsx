@@ -102,9 +102,12 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
     setError(null);
 
     try {
-      // Timeout pour éviter les attentes trop longues
+      // Timeout adapté selon l'appareil (mobile = plus long)
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 secondes max
+      const timeoutDuration = isMobile ? 60000 : 30000; // 60s mobile, 30s desktop
+      const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
+      
+      console.log('📱 Envoi requête chat depuis', isMobile ? 'MOBILE' : 'DESKTOP', 'timeout:', timeoutDuration + 'ms');
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -121,9 +124,12 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
 
       clearTimeout(timeoutId);
 
+      console.log('📡 Réponse reçue:', response.status, response.statusText);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMsg = errorData.details || errorData.error || 'Erreur de réponse du serveur';
+        console.error('❌ Erreur API:', errorMsg, errorData);
         throw new Error(errorMsg);
       }
 
@@ -145,18 +151,24 @@ export function ChatAssistant({ onEventAction, events = [] }: ChatAssistantProps
       }]);
 
       // Lire le stream et mettre à jour en temps réel
+      console.log('🌊 Début du streaming...');
+      let chunkCount = 0;
+      
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true });
         assistantMessage += chunk;
+        chunkCount++;
 
         // Mettre à jour immédiatement pour un streaming fluide
         setMessages(prev => prev.map(m =>
           m.id === assistantId ? { ...m, content: assistantMessage } : m
         ));
       }
+      
+      console.log('✅ Streaming terminé. Chunks reçus:', chunkCount, 'Longueur:', assistantMessage.length);
 
       // Vérifier si le message contient une action d'événement
       const action = parseAction(assistantMessage);
