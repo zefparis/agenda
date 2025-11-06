@@ -26,6 +26,16 @@ interface UseWakeWordMobileReturn extends WakeWordState {
   isSupported: boolean;
   isMobile: boolean;
   platform: 'android' | 'ios' | 'desktop';
+  diagnosticInfo: DiagnosticInfo;
+  fallbackMode: boolean;
+}
+
+interface DiagnosticInfo {
+  isSecureContext: boolean;
+  hasGetUserMedia: boolean;
+  hasAudioContext: boolean;
+  audioContextState?: string;
+  permissionState?: PermissionState;
 }
 
 /**
@@ -66,6 +76,12 @@ export function useWakeWordMobile(options: UseWakeWordMobileOptions): UseWakeWor
   
   const [isSupported, setIsSupported] = useState(true);
   const [hasPermission, setHasPermission] = useState(false);
+  const [fallbackMode, setFallbackMode] = useState(false);
+  const [diagnosticInfo, setDiagnosticInfo] = useState<DiagnosticInfo>({
+    isSecureContext: false,
+    hasGetUserMedia: false,
+    hasAudioContext: false
+  });
   
   const platform = detectPlatform();
   const isMobile = isMobileDevice();
@@ -73,6 +89,48 @@ export function useWakeWordMobile(options: UseWakeWordMobileOptions): UseWakeWor
   const hasInitialized = useRef(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const wakeLockRef = useRef<any>(null);
+  
+  /**
+   * Diagnostic du système
+   */
+  const runDiagnostic = useCallback(async () => {
+    try {
+      const info: DiagnosticInfo = {
+        isSecureContext: window.isSecureContext,
+        hasGetUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+        hasAudioContext: !!(window.AudioContext || (window as any).webkitAudioContext)
+      };
+
+      // État AudioContext
+      if (audioContextRef.current) {
+        info.audioContextState = audioContextRef.current.state;
+      }
+
+      // Permission microphone
+      if ('permissions' in navigator) {
+        try {
+          const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+          info.permissionState = result.state;
+        } catch (err) {
+          console.warn('⚠️ Permissions API non supportée');
+        }
+      }
+
+      setDiagnosticInfo(info);
+
+      // Activer fallback si problèmes critiques
+      if (!info.isSecureContext || !info.hasGetUserMedia) {
+        console.warn('⚠️ Problèmes critiques détectés, activation du mode fallback');
+        setFallbackMode(true);
+      }
+
+      return info;
+    } catch (error) {
+      console.error('❌ Erreur diagnostic:', error);
+      setFallbackMode(true);
+      return diagnosticInfo;
+    }
+  }, [diagnosticInfo]);
   
   /**
    * Demander la permission micro
@@ -233,6 +291,9 @@ export function useWakeWordMobile(options: UseWakeWordMobileOptions): UseWakeWor
       try {
         console.log('🚀 Initialisation wake word mobile...');
         
+        // 0. Diagnostic système
+        await runDiagnostic();
+        
         // 1. Vérifier support
         if (!('mediaDevices' in navigator) || !('getUserMedia' in navigator.mediaDevices)) {
           throw new Error('getUserMedia non supporté');
@@ -307,7 +368,7 @@ export function useWakeWordMobile(options: UseWakeWordMobileOptions): UseWakeWor
     return () => {
       mounted = false;
     };
-  }, [options.enabled, options.accessKey, options.modelPath, options.sensitivity, options.autoStart, handleWake, requestPermission, initAudioContext, requestWakeLock]);
+  }, [options.enabled, options.accessKey, options.modelPath, options.sensitivity, options.autoStart, handleWake, requestPermission, initAudioContext, requestWakeLock, runDiagnostic]);
   
   /**
    * Écouter visibilité
@@ -368,6 +429,8 @@ export function useWakeWordMobile(options: UseWakeWordMobileOptions): UseWakeWor
     requestPermission,
     isSupported,
     isMobile,
-    platform
+    platform,
+    diagnosticInfo,
+    fallbackMode
   };
 }

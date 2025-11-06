@@ -4,7 +4,7 @@
  * Compatible Android / Samsung S23
  */
 
-const CACHE_NAME = 'agenda-ia-v4';
+const CACHE_NAME = 'agenda-ia-v5'; // Incrémenté pour fallback micro
 const OFFLINE_URL = '/offline';
 
 // Fichiers à mettre en cache pour l'offline
@@ -114,6 +114,12 @@ self.addEventListener('message', (event) => {
     handleWakeWordDetection(event);
   }
   
+  if (event.data.type === 'FALLBACK_MODE_ACTIVATED') {
+    // Mode fallback activé (micro manuel)
+    console.log('[SW] Mode fallback micro activé');
+    handleFallbackMode(event);
+  }
+  
   if (event.data.type === 'KEEP_ALIVE') {
     // Ping pour maintenir le SW actif
     event.ports[0].postMessage({ type: 'PONG' });
@@ -123,6 +129,27 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
+
+// ========================================
+// FALLBACK MODE (Micro manuel)
+// ========================================
+async function handleFallbackMode(event) {
+  console.log('[SW] 🎤 Mode fallback micro activé');
+  
+  // Broadcaster à tous les clients
+  const clients = await self.clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true
+  });
+  
+  clients.forEach(client => {
+    client.postMessage({
+      type: 'FALLBACK_MODE_ACTIVE',
+      timestamp: Date.now(),
+      reason: event.data.reason || 'unknown'
+    });
+  });
+}
 
 // ========================================
 // NOTIFICATION + VIBRATION
